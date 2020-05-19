@@ -22,14 +22,13 @@ int Process::Pid() const { return pid_; }
  * @param activeJif
  * @param systemJif
  */ 
-float Process::CpuUtilization(long activeJif, long systemJif) {
-  cpu_ = static_cast<float>(systemJif - prevSystemJiff_) / (activeJif - prevActiveJiff_);
+void Process::CpuUtilization(long activeJif, long systemJif) {
+  cpu_ = static_cast<float>((activeJif - prevActiveJiff_)) / (systemJif - prevSystemJiff_);
   prevSystemJiff_ = systemJif;
   prevActiveJiff_ = activeJif;
-  return cpu_;
 }
 
-float Process::GetCpuUtilization() const { return cpu_; }
+float Process::CpuUtilization() const { return cpu_; }
 
 // TODO: Return the command that generated this process
 string Process::Command() { return LinuxParser::Command(Pid()); }
@@ -44,10 +43,10 @@ string Process::User() { return LinuxParser::User(Pid()); }
 long int Process::UpTime() { return LinuxParser::UpTime(Pid()); }
 
 // TODO: Overload the "less than" comparison operator for Process objects
-bool Process::operator<(Process const& a) const {
-  return GetCpuUtilization() < a.GetCpuUtilization();
+bool Process::operator<(const Process& a) const {
+  return CpuUtilization() < a.CpuUtilization();
 }
 
-bool Process::operator>(Process const& a) const {
-  return GetCpuUtilization() > a.GetCpuUtilization();
+bool Process::operator>(const Process& a) const {
+  return CpuUtilization() > a.CpuUtilization();
 }

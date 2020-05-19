@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <experimental/filesystem>
 
 #include "linux_parser.h"
@@ -20,17 +21,29 @@ Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() {
-  std::vector<int> currentPids{};
-  currentPids = LinuxParser::Pids();
-  for (int pid: currentPids) {
-    Process newProcess(pid);
-    newProcess.CpuUtilization(LinuxParser::ActiveJiffies(newProcess.Pid()), 
-                              LinuxParser::Jiffies());
-    processes_.push_back(newProcess);
+  std::vector<int> currentPids, newPids{LinuxParser::Pids()};
+  for (Process& p : processes_) {
+    currentPids.push_back(p.Pid());
+  }
+
+  for (int pid: newPids) {
+    if (!(std::find(currentPids.begin(), currentPids.end(), pid) != currentPids.end())) {
+      // it's a new process
+      
+      Process newProcess(pid);
+      processes_.emplace_back(newProcess);
+    }
+  }
+  
+  for (Process& p: processes_) {
+       p.CpuUtilization(LinuxParser::ActiveJiffies(p.Pid()), 
+                                LinuxParser::Jiffies());
   }
 
   std::sort(processes_.begin(), processes_.end(), std::greater<Process>());
+  
   return processes_;
+  
 }
 
 // TODO: Return the system's kernel identifier (string)

@@ -53,31 +53,13 @@ std::string Uid(int pid);
 std::string User(int pid);
 long int UpTime(int pid);
 
-// Some Utils
-template <typename T>
-  T GetValueByKey(std::string const &file, std::string const &key){
-  std::string line, chunk;
-  T result;
-  std::ifstream filestream(file);
-  if (filestream.is_open()) {
-    while(std::getline(filestream, line)) {
-      std::istringstream linestream(line);  
-      if(linestream >> chunk) {
-        if (chunk == key) {
-          if (linestream >> chunk) {
-            return result;
-          }
-        }
-      }
-    }
-  }
-  return result;
-};
-
-// TODO: add patterns as constants... like VmSize: Uid: ... etc
 const std::string kVmSize{"VmSize:"};
+const std::string kMemTotalTag{"MemTotal:"};
+const std::string kMemFreeTag{"MemFree:"};
+const std::string kMemBuffersTag{"Buffers:"};
 const std::string kUid{"Uid:"};
 const std::string kCpu{"cpu"};
+const std::string kVersionTag{"version"};
 }  // namespace LinuxParser
 
 #endif

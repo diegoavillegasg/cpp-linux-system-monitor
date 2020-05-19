@@ -6,8 +6,8 @@ float Processor::Utilization() {
   float utilization{0};
   long activeJif = LinuxParser::ActiveJiffies();
   long idleJif = LinuxParser::IdleJiffies();
-  
+  utilization = static_cast<float>((activeJif - prevActiveJiff_)) / ((activeJif - prevActiveJiff_) + (idleJif - prevIdleJiff_));
   prevActiveJiff_ = activeJif;
   prevIdleJiff_ = idleJif;
-  // return ((activeJif + idleJif) / 4 ) / LinuxParser::UpTime();
+  return utilization;
 }
